@@ -8,7 +8,7 @@
     title: [Building an Interpreter (to make Pong)],
     subtitle: [Community Kickoff],
     author: [Soham Karandikar],
-    date: datetime.today(),
+    date: datetime(year: 2026, month: 4, day: 24),
   ),
   font: "Fira Sans",
 )
