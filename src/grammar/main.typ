@@ -151,7 +151,7 @@ expr
 primary
 ├─ literal
 │  ├─ integer
-│  └─ float
+│  ├─ float
 │  └─ String
 ├─ identifier
 └─ ( expr )
