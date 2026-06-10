@@ -152,6 +152,7 @@ primary
 ├─ literal
 │  ├─ integer
 │  └─ float
+│  └─ String
 ├─ identifier
 └─ ( expr )
 ```
