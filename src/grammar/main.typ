@@ -377,12 +377,22 @@ fn main() {
 }
 ```
 
-== Extern Include
+== Import
 
-Includes an external header via `import "filename": struct1, function1`.
+Loads a module via `import "filename": struct1, function1`.
 
 ```rust
 import "string" : String, concat
+import "string" : *
+```
+
+== Extern
+
+Includes an external header via extern: fn name(parameters) : returnType.
+
+```rust
+extern: fn hello()
+extern: fn hello(i : int) : int
 ```
 
 == Literal
