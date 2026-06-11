@@ -510,6 +510,23 @@ Stmt* parse_stmt(Parser* P){
     }
 }
 
+Stmt* parse_top_level(Parser* P){
+    Token t=peek(P);
+    switch(t.type){
+        case TOKEN_FUNCTION:{
+            return parse_func(P);
+        }
+        case TOKEN_TYPE_INT:
+        case TOKEN_TYPE_BOOL:
+        case TOKEN_TYPE_STRING:
+        case TOKEN_TYPE_SIZE_T:
+        case TOKEN_TYPE_FLOAT:
+            return parse_variable_declaration(P);
+        default:
+        error(t);
+    }
+}
+
 Stmt* parseProgram(Parser* p){
     Stmt* head=NULL;
     Stmt* traverse=NULL;
