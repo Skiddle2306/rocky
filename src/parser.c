@@ -5,6 +5,7 @@
 #include "rocky/parser/parser.h"
 #include "rocky/arena.h"
 #include "rocky/lexer/lexer.h"
+#include "rocky/parser/nodes.h"
 #include "rocky/lexer/token.h"
 
 Stmt* parse_stmt(Parser* P);
@@ -222,7 +223,7 @@ Expr *parse_expr(Parser *p, int min_bp) {
 
     return lhs;
 }
-Stmt* variable_assignment(Parser* P){
+Stmt* parse_variable_assignment(Parser* P){
     Token t=advance(P);
     expect(P,TOKEN_EQUAL);
     Expr* expr=parse_expr(P,0);
@@ -248,7 +249,7 @@ Stmt *parse_expr_stmt(Parser *p) {
     // assignment — IDENT followed by '='
     if (t.type == TOKEN_IDENTIFIER &&
         p->tokens[p->pos + 1].type == TOKEN_EQUAL) {
-        return variable_assignment(p);
+        return parse_variable_assignment(p);
     }
 
     // plain expression statement — function calls etc
@@ -327,7 +328,7 @@ Stmt* parse_while(Parser* P){
     Expr* cond=parse_expr(P,0);
     expect(P,TOKEN_RPAREN);
     //Always expects a { after the condition
-    Stmt *body=parse_block(P);
+    Stmt *body=parse_stmt(P);
     Stmt* S=alloc_stmt(P, STMT_WHILE, t);
     S->defi.while_stmt.cond=cond;
     S->defi.while_stmt.body=body;
@@ -339,9 +340,9 @@ Stmt* parse_for(Parser* P){
     expect(P,TOKEN_LPAREN);
     Stmt* declaration=parse_expr_stmt(P);
     Expr* cond=parse_expr(P,0);
-    Stmt* update=parse_expr_stmt(P);
+    Expr* update=parse_expr(P,0);
     expect(P,TOKEN_RPAREN);
-    Stmt* body=parse_block(P);
+    Stmt* body=parse_stmt(P);
     Stmt* S=alloc_stmt(P,STMT_FOR,t);
     S->defi.for_stmt.declaration=declaration;
     S->defi.for_stmt.cond=cond;
@@ -364,7 +365,7 @@ Stmt* parse_if(Parser* P){
     expect(P,TOKEN_LPAREN);
     Expr* cond=parse_expr(P,0);
     expect(P,TOKEN_RPAREN);
-    Stmt *block=parse_block(P);
+    Stmt *block=parse_stmt(P);
     Token t2=peek(P);
     Stmt *elseBody=NULL;
     if(t2.type==TOKEN_ELSE){
@@ -391,7 +392,7 @@ Stmt* parse_break(Parser* P){
     Stmt* S=alloc_stmt(P, STMT_BREAK, t);
     return S;
 }
-Stmt* variable_declaration(Parser* P){
+Stmt* parse_variable_declaration(Parser* P){
     Token t=advance(P);
     Token name=expect(P,TOKEN_IDENTIFIER);
     Expr* expr=NULL;
@@ -411,11 +412,11 @@ Stmt* variable_declaration(Parser* P){
     }else if(adv.type!=TOKEN_SEMICOLON){
         error(adv);
     }
-    Stmt* S=alloc_stmt(P,STMT_DECLARTION,t);
-    S->defi.declartion_stmt.name=name;
-    S->defi.declartion_stmt.type=type;
-    S->defi.declartion_stmt.name=name;
-    S->defi.declartion_stmt.expr=expr;
+    Stmt* S=alloc_stmt(P,STMT_DECLARATION,t);
+    S->defi.declaration_stmt.name=name;
+    S->defi.declaration_stmt.type=type;
+    S->defi.declaration_stmt.name=name;
+    S->defi.declaration_stmt.expr=expr;
     return S;
 }
 
@@ -482,12 +483,11 @@ Stmt* parse_stmt(Parser* P){
         case TOKEN_TYPE_STRING:
         case TOKEN_TYPE_SIZE_T:
         case TOKEN_TYPE_FLOAT:
-            return variable_declaration(P);
+            return parse_variable_declaration(P);
         default:
             return parse_expr_stmt(P);
     }
 }
-
 
 Stmt* parseProgram(Parser* p){
     Stmt* head=NULL;

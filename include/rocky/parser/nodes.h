@@ -1,6 +1,7 @@
 #ifndef NODES_H
 #define NODES_H
 #include "rocky/lexer/token.h"
+#include "rocky/parser/ast.h"
 #include "rocky/parser/parser.h"
 
 typedef struct Parser Parser;
@@ -20,7 +21,7 @@ typedef enum {
     STMT_FOR,
     STMT_BLOCK,
     STMT_FUNC,
-    STMT_DECLARTION,
+    STMT_DECLARATION,
     STMT_ASSIGN,
     STMT_CONTINUE,
     STMT_BREAK
@@ -33,13 +34,12 @@ typedef struct Stmt {
     struct Stmt *next;
     union {
             struct {                                    }continue_stmt;
-            struct { Token type; Token name; Expr* expr; }declartion_stmt;
+            struct { Token type; Token name; Expr* expr; }declaration_stmt;
             struct {                                    }break_stmt;
             struct { Expr *expr;                        } expr_stmt;
             struct { Expr *cond; Stmt *body; Stmt *elseBody; } if_stmt;
             struct { Expr *cond; Stmt *body;             } while_stmt;
-            struct { Stmt* declaration;Expr* cond;Stmt* update; Stmt *body;             } for_stmt;
-
+            struct { Stmt* declaration;Expr* cond;Expr* update; Stmt *body; } for_stmt;
             struct { Token name; Expr *value;            } decl_stmt;
             struct { Expr *value;                        } return_stmt;
             struct { Stmt *body;                         } block_stmt;
